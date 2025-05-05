@@ -38,6 +38,7 @@
   margin: 0 auto;
   overflow: hidden;
   background-color: var(--background);
+  overflow-y: auto ;
 }
 .system {
   height:44px;
@@ -84,6 +85,7 @@
   height: 55px;
   display: flex;
   align-items: center;
+  position: relative;
 }
 .app_head > .sub_title {
   position: absolute;
@@ -96,6 +98,7 @@
 .app_body {
   padding: 20px var(--app_padding);
 }
+.challenge_item + .challenge_item {margin-top:15px}
 .challenge_item {
   border-radius: 8px;
   height: 280px;
@@ -104,24 +107,31 @@
   gap: 15px;
   color: var(--wgm_white);
   border: 1px solid rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
 }
 .challenge_item > .title {
   height:140px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-end;
   padding-left:20px;
 }
 .challenge_item > .title > h2 {
   font-weight: 500;
   font-size: 24px;
+  white-space: pre-line;
 }
 .challenge_item > .challengers {
   display: flex;
   padding-left:20px;
   align-items: center;
+  height: 28px;
+  gap: 20px
 }
-.challenge_item > .challengers > span{
+.challenge_item > .challengers > .avatars {
+  display: flex;
+}
+.challenge_item > .challengers span{
   border:1px solid white;
   font-size: 0;
   width: 28px;
@@ -132,8 +142,7 @@
   background-color: #C2E3D0;
   margin-right: -5px;
 }
-.challenge_item > .challengers > b {
-  margin-left: 15px;
+.challenge_item > .challengers b {
   font-size: 14px;
   font-weight: 500;
 }
@@ -146,5 +155,10 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 .challenge_item > .info > .description {
-  font-size: 18px;
+  font-size: 16px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;      /* 표시할 줄 수 */
+  overflow: hidden;
 }
