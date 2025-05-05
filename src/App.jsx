@@ -1,14 +1,11 @@
-import { useState, useEffect } from 'react'
-import ChallengeList from './components/ChallengeList';
-import ChallengeDetail from './components/ChallengeDetail';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
-import './App.css'
-import AppHeader from './components/AppHeader';
+import { useState, useEffect } from 'react';
+import Challenge from './components/Challenge';
 import { UserProvider, useUser } from './contexts/UserContext';
+import './App.css';
 
 function App() {
   const [theme, setTheme] = useState('light'); // 테마 상태 추가
-  const [page, setPage] = useState('challengeList');
+  const [pageName, setPageName] = useState('challengeList');
   const [challengeId, setChallengeId] = useState('');
 
   // 테마 변경 함수
@@ -46,7 +43,7 @@ function App() {
   }, []);
 
   function onSelectPage(pageName, challengeId) {
-    setPage(pageName);
+    setPageName(pageName);
     setChallengeId(challengeId);
   }
 
@@ -65,15 +62,10 @@ function App() {
             </button>
           </div>
             {
-              page === 'challengeList' ? (
-                <ChallengeList 
-                  onSelectPage={onSelectPage}
-                />
-              ) : page === 'challengeDetail' && (
-                <ChallengeDetail
-                  onSelectPage={onSelectPage}
-                />
-              )
+              <Challenge 
+                onSelectPage={onSelectPage}
+                pageName={pageName}
+              />
             }  
         </div>
       </UserProvider>
