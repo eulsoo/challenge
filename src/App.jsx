@@ -64,11 +64,6 @@ function App() {
               {theme === 'dark' ? '☀️' : '🌙'}
             </button>
           </div>
-          <AppHeader 
-            type={page} 
-            target={challengeId} 
-          />
-          <main className='app_body'>
             {
               page === 'challengeList' ? (
                 <ChallengeList 
@@ -80,7 +75,6 @@ function App() {
                 />
               )
             }  
-          </main>
         </div>
       </UserProvider>
     </>
