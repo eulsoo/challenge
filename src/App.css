@@ -7,6 +7,7 @@
   --wgm_white: #ffffff;
   --gray_10: #E0E0E0;
   --gray_20: #DBDBDB;
+  --gray_30: #C4C4C4;
   --gray_50: #818181;
   --gray_80: #4f4f4f;
   --gray_90: #333333;
@@ -51,11 +52,15 @@
   font-size: 0;
   background-color: transparent;
   background-repeat: no-repeat;
+  cursor: pointer;
 }
 .sub_title {
   font-size: 22px;
   font-weight: 400;
   color: var(--text-primary);
+}
+.btn {
+  cursor: pointer;
 }
 .btn.trans {
   color: var(--wgm_white);
@@ -65,6 +70,13 @@
   border-radius: 28px;
   box-sizing: border-box;
   border:1px solid rgba(255, 255, 255, 0.2);
+}
+.btn.line {
+  padding: 5px 9px 3px;
+  border: 1px solid var(--gray_30);
+  border-radius: 14px;
+  box-sizing: border-box;
+  color: var(--gray_80);
 }
 
 /* 테마 토글 버튼 */
@@ -85,13 +97,13 @@
   height: 55px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   position: relative;
 }
 .app_head > .sub_title {
   position: absolute;
   left:50%;
-  transform: translate(-50%, 0);
-  font-size: ;
+  transform: translate(-50%, -2px);
 }
 
 /* app_body */

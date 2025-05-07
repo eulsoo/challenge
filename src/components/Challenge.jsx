@@ -1,55 +1,17 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../supabase';
+import AppStateDisplay from './AppStateDisplay'; 
+import AppSubHeader from './AppSubHeader';
+import AppContent from './AppContent';
+import AppIcon from './AppIcon';
 import ChallengeListItem from './ChallengeListItem';
 import ChallengeDetailContent from './ChallengeDetailContent';
 
-// 챌린지 헤더
-function ChallengeHeader() {
-  return (
-    <div className='app_head'>
-      <button className='ico_btn back'>
-      <svg  width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path style={{fill: 'var(--text-primary)'}} d="M15.707 4.293C15.8945 4.48053 15.9998 4.73484 15.9998 5C15.9998 5.26516 15.8945 5.51947 15.707 5.707L9.41403 12L15.707 18.293C15.8892 18.4816 15.99 18.7342 15.9877 18.9964C15.9854 19.2586 15.8803 19.5094 15.6948 19.6948C15.5094 19.8802 15.2586 19.9854 14.9964 19.9877C14.7342 19.99 14.4816 19.8892 14.293 19.707L7.29303 12.707C7.10556 12.5195 7.00024 12.2652 7.00024 12C7.00024 11.7348 7.10556 11.4805 7.29303 11.293L14.293 4.293C14.4806 4.10553 14.7349 4.00021 15 4.00021C15.2652 4.00021 15.5195 4.10553 15.707 4.293Z"/>
-      </svg>
-      </button>
-      <h1 className='sub_title'>챌린지</h1>
-    </div>
-  );
-}
-// 챌린지 아이템을 children으로 안길수 있도록 셋팅하는 컴포넌트
-function ChallengeListContent({children}) {
-  return (
-    <main className='app_body'>
-      <ul className='challenges'>
-        {children}
-      </ul>
-    </main>
-  );
-}
-// 로딩 및 에러 상태 컴포넌트
-function ChallengeStatus({loading, error}) {
-  if (loading) {
-    return <div className="loading">로딩 중...</div>;
-  }
-  
-  if (error) {
-    return <div className="error">{error}</div>;
-  }
-  return null;
-}
-// 메인 컴포넌트 
-function ChallengeContainer({children}) {
-  return (
-    <>
-      <ChallengeHeader />
-      {children}
-    </>
-  );
-}
 export default function Challenge({onSelectPage, pageName}) {
   const [challenges, setChallenges] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [headerTitle, setHeaderTitle] = useState('챌린지');
 
   // 챌린지 데이터 작업
   useEffect(() => {
@@ -111,34 +73,61 @@ export default function Challenge({onSelectPage, pageName}) {
 
   if (loading || error) {
     return (
-      <ChallengeContainer>
-        <ChallengeStatus loading={loading} error={error}/>
-      </ChallengeContainer>
+      <AppStateDisplay loading={loading} error={error}/>
     );
   }
   if (pageName === 'challengeList') {
     return (
-      <ChallengeContainer>
-        <ChallengeListContent>
-          {
-            challenges.map(challenge => (
-              <ChallengeListItem 
-                key={challenge.challenge_id}
-                challenge={challenge}
-                onSelectPage={onSelectPage}
-              />
-            ))
-          }
-        </ChallengeListContent>
-      </ChallengeContainer>
+      <>
+        <AppSubHeader>
+          <AppSubHeader.Left>
+            <button className='ico_btn back'>
+              <AppIcon name={'back'} />
+            </button>
+          </AppSubHeader.Left>
+          <AppSubHeader.Center>
+            <h1 className='sub_title'>{'챌린지'}</h1>
+          </AppSubHeader.Center>
+        </AppSubHeader>
+        <AppContent>
+          <ul className='challenges'>
+            {
+              challenges.map(challenge => (
+                <ChallengeListItem 
+                  key={challenge.challenge_id}
+                  challenge={challenge}
+                  onSelectPage={onSelectPage}
+                />
+              ))
+            }
+          </ul>
+        </AppContent>
+      </>
     );
   }
   if (pageName === 'challengeDetail') {
     return (
-      <ChallengeContainer>
-        <ChallengeDetailContent />
-      </ChallengeContainer>
+      <>
+        <AppSubHeader>
+          <AppSubHeader.Left>
+            <button 
+              className='ico_btn back' 
+              onClick={() => onSelectPage('challengeList')}
+            >
+              <AppIcon name={'back'} />
+            </button>
+          </AppSubHeader.Left>
+          <AppSubHeader.Center>
+            <h1 className='sub_title'>{'챌린지'}</h1>
+          </AppSubHeader.Center>
+          <AppSubHeader.Right>
+            <button className='btn small line'>그만두기</button>
+          </AppSubHeader.Right>
+        </AppSubHeader>
+        <AppContent>
+          <ChallengeDetailContent />
+        </AppContent>
+      </>
     );
   }
-
 }
