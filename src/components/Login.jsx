@@ -23,7 +23,8 @@ export default function Login({ onSelectPage }) {
       if (error) throw error;
       
       // 로그인 성공 시 챌린지 목록 화면으로 이동
-      onSelectPage('challengeList');
+      console.log('로그인 성공, 페이지 전환 시도');
+      // onSelectPage('challengeList');
       
     } catch (error) {
       setError(error.message);

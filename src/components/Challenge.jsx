@@ -80,7 +80,7 @@ export default function Challenge({onSelectPage, pageName}) {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       console.log('로그아웃 성공');
-      onSelectPage('login');
+      // onSelectPage('login');
     } catch (error) {
       console.error('로그아웃 오류:', error);
     }

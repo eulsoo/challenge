@@ -42,7 +42,6 @@ export function UserProvider({ children }) {
           console.log('세션 없음');
           setUser(null);
         }
-        
         setLoading(false);
         console.log('setLoading(false) 호출됨');
       } catch (error) {
@@ -56,6 +55,25 @@ export function UserProvider({ children }) {
   }, []);
   
   console.log('UserContext 현재 상태:', { user, loading });
+  
+  // UserContext.jsx에서 확실한 상태 업데이트 보장
+  supabase.auth.onAuthStateChange((event, session) => {
+    console.log('Auth 이벤트:', event, Boolean(session));
+    
+    if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+      if (session) {
+        setUser({
+          user_id: session.user.id,
+          name: 'User',
+          profile_image: null
+        });
+      } else {
+        setUser(null);
+      }
+      // 상태 업데이트가 확실히 반영되도록 로딩 상태 변경
+      setLoading(false);
+    }
+  });
   
   return (
     <UserContext.Provider value={{ user, setUser, loading }}>
