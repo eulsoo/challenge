@@ -6,19 +6,13 @@ function AppSubHeader({ children }) {
   );
 }
 function Left({ children }) {
-  return (
-    <>{ children }</>
-  );
+  return <>{ children }</>;
 }
 function Center({children }) {
-  return (
-    <>{ children }</>
-  );
+  return <>{ children }</>;
 }
 function Right({ children }) {
-  return (
-    <>{ children }</>
-  );
+  return <>{ children }</>;
 }
 
 AppSubHeader.Left = Left;

@@ -69,7 +69,7 @@ export default function ChallengeListItem({challenge, onSelectPage}) {
         <div className='badge'><img src={`${badgeImageUrl}/${challenge.badge_image}`} /></div>
         <p className='description'>{challenge.description}</p>
         { (() => {
-            const participant = challenge.participants.find(
+            const participant = user && challenge.participants.find(
               participant => participant.user_id === user.user_id
             );
             

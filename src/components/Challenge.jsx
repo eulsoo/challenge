@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../supabase';
+import { useUser } from '../contexts/UserContext'; // 이미 임포트됨
 import AppStateDisplay from './AppStateDisplay'; 
 import AppSubHeader from './AppSubHeader';
 import AppContent from './AppContent';
@@ -12,6 +13,7 @@ export default function Challenge({onSelectPage, pageName}) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [headerTitle, setHeaderTitle] = useState('챌린지');
+  const { user, setUser } = useUser(); // useUser 훅 사용
 
   // 챌린지 데이터 작업
   useEffect(() => {
@@ -71,6 +73,19 @@ export default function Challenge({onSelectPage, pageName}) {
     fetchChallenges();
   }, []);
 
+  // 로그아웃 핸들
+  const handleLogout = async () => {
+    try {
+      console.log('로그아웃 시도');
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      console.log('로그아웃 성공');
+      onSelectPage('login');
+    } catch (error) {
+      console.error('로그아웃 오류:', error);
+    }
+  };
+
   if (loading || error) {
     return (
       <AppStateDisplay loading={loading} error={error}/>
@@ -81,13 +96,19 @@ export default function Challenge({onSelectPage, pageName}) {
       <>
         <AppSubHeader>
           <AppSubHeader.Left>
-            <button className='ico_btn back'>
+            {/* <button className='ico_btn back'>
               <AppIcon name={'back'} />
-            </button>
+            </button> */}
           </AppSubHeader.Left>
           <AppSubHeader.Center>
             <h1 className='sub_title'>{'챌린지'}</h1>
           </AppSubHeader.Center>
+          <AppSubHeader.Right>
+            <button 
+              className='btn small line'
+              onClick={handleLogout}
+            >로그아웃</button>
+          </AppSubHeader.Right>
         </AppSubHeader>
         <AppContent>
           <ul className='challenges'>
