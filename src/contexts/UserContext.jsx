@@ -32,12 +32,7 @@ export function UserProvider({ children }) {
         
         if (data.session) {
           console.log('세션 있음');
-          setUser({
-            user_id: data.session.user.id,
-            // 임시로 기본 사용자 정보만 설정
-            name: 'User',
-            profile_image: null
-          });
+          setUser({user_id: data.session.user.id});
         } else {
           console.log('세션 없음');
           setUser(null);

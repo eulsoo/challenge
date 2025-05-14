@@ -1,38 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
 import { supabase } from '../supabase';
 import { useUser } from '../contexts/UserContext';
 
 export default function ChallengeListItem({challenge, onSelectPage}) {
-  const [bgImageUrl, setBgImageUrl] = useState('');
-  const [badgeImageUrl, setBadgeImageUrl] = useState('');
-  const [profileImageUrl, setProfileImageUrl] = useState('');
   const { user, setUser } = useUser();
-
-  useEffect(() => {
-    async function fetchBgData() {
-      const { data } = await supabase.storage.from('images').getPublicUrl('challengeBg');
-      setBgImageUrl(data.publicUrl);
-    }
-    async function fetchBadgeData() {
-      const { data } = await supabase.storage.from('images').getPublicUrl('challengeBadge');
-      setBadgeImageUrl(data.publicUrl);
-    }
-    async function fetchProfileData() {
-      const { data } = await supabase.storage.from('images').getPublicUrl('profileImg');
-      setProfileImageUrl(data.publicUrl);
-    }
-    fetchBgData();
-    fetchBadgeData();
-    fetchProfileData();
-  }, [challenge.image]);
-
 
   return (
     <li className='challenge_item' style={{
       backgroundImage: `
         linear-gradient(
           180deg, rgba(0, 0, 0, 0.00) 18.75%, ${challenge.color} 55.38%), 
-          url(${bgImageUrl}/${challenge.image})
+          url(${challenge.image})
       `,
       backgroundPosition: 'left top',
       backgroundSize: '100% auto',
@@ -53,7 +31,7 @@ export default function ChallengeListItem({challenge, onSelectPage}) {
                   <span 
                     key={`${participant.enrollment_id}-${i}`}
                     style={{
-                      backgroundImage: `url(${profileImageUrl}/${participant.profile_image})`,
+                      backgroundImage: `url(${participant.profile_image})`,
                       backgroundSize: '100% auto',
                       backgroundRepeat: 'no-repeat',
                     }}
@@ -66,7 +44,7 @@ export default function ChallengeListItem({challenge, onSelectPage}) {
         }
       </div>
       <div className='info'>
-        <div className='badge'><img src={`${badgeImageUrl}/${challenge.badge_image}`} /></div>
+        <div className='badge'><img src={`${challenge.badge_image}`} /></div>
         <p className='description'>{challenge.description}</p>
         { (() => {
             const participant = user && challenge.participants.find(
@@ -108,7 +86,7 @@ export default function ChallengeListItem({challenge, onSelectPage}) {
             return (
               <button 
                 className={buttonConfig.className}
-                onClick={() => onSelectPage('challengeDetail', 'challenge_id')}
+                onClick={() => onSelectPage('challengeDetail', challenge.challenge_id)}
               >
                 {buttonConfig.text}
               </button>

@@ -25,8 +25,9 @@ function AppContent() {
   console.log('현재 페이지:', pageName);
 
   // 페이지 전환 함수
-  function navigateTo(targetPage, params = {}) {
-    if (params.challengeId) setChallengeId(params.challengeId);
+  function onSelectPage(targetPage, challengeId) {
+    if (challengeId) setChallengeId(challengeId);
+    console.log("선택된챌린지ID" + challengeId);
     setPageName(targetPage);
   }
   // 인증 상태 변경 시 페이지 재검증
@@ -38,12 +39,12 @@ function AppContent() {
     
     // 인증이 필요한 페이지인데 사용자가 없으면 로그인으로 리디렉션
     if (currentPageRule?.requiresAuth && !user) {
-      navigateTo(PAGES.LOGIN);
+      onSelectPage(PAGES.LOGIN);
     }
     
     // 이미 로그인된 상태에서 로그인 페이지에 있으면 챌린지 목록으로 리디렉션
     if (pageName === PAGES.LOGIN && user) {
-      navigateTo(PAGES.CHALLENGE_LIST);
+      onSelectPage(PAGES.CHALLENGE_LIST);
     }
   }, [user, pageName, loading]);
 
@@ -55,19 +56,18 @@ function AppContent() {
     // 인증이 필요한 페이지인데 사용자가 없는 경우
     const currentPageRule = AUTH_RULES[pageName];
     if (currentPageRule?.requiresAuth && !user) {
-      return <Login onSelectPage={navigateTo} />;
+      return <Login onSelectPage={onSelectPage} />;
     }
-
     // 페이지별 렌더링
     switch (pageName) {
       case PAGES.LOGIN:
-        return <Login onSelectPage={navigateTo} />;
+        return <Login onSelectPage={onSelectPage} />;
       
       case PAGES.CHALLENGE_LIST:
       case PAGES.CHALLENGE_DETAIL:
         return (
           <Challenge 
-            onSelectPage={navigateTo}
+            onSelectPage={onSelectPage}
             pageName={pageName}
             challengeId={challengeId}
           />
@@ -77,9 +77,7 @@ function AppContent() {
         return <AppStateDisplay error="페이지를 찾을 수 없습니다" />;
     }
   }
-
   return renderPage();
-
 }
 
 function App() {

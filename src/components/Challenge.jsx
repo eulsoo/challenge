@@ -7,71 +7,10 @@ import AppContent from './AppContent';
 import AppIcon from './AppIcon';
 import ChallengeListItem from './ChallengeListItem';
 import ChallengeDetailContent from './ChallengeDetailContent';
+import { useChallenges } from '../contexts/UseChallenges';
 
-export default function Challenge({onSelectPage, pageName}) {
-  const [challenges, setChallenges] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [headerTitle, setHeaderTitle] = useState('챌린지');
-  const { user, setUser } = useUser(); // useUser 훅 사용
-
-  // 챌린지 데이터 작업
-  useEffect(() => {
-    async function fetchChallenges() {
-      try {
-        setLoading(true);
-
-        // 1. 챌린지 데이터 불러오기 
-        const { data: challengesData, error: challengesError } = await supabase
-          .from('challenges')
-          .select(`
-            *,
-            participants:participants(
-              enrollment_id,
-              user_id,
-              status,
-              users:users!user_id(
-                user_id, 
-                name, 
-                profile_image
-              )
-            )
-          `)
-          .order('created_at', { ascending: true }); // 생성 순서로 정렬 (최신순)
-
-          console.log("원본 데이터:", challengesData);
-        if (challengesError) throw challengesError;
-
-        // 2. 챌린지별 참여자 수 계산하여 데이터 가공
-        const processedChallenges = challengesData.map(challenge => {
-          // 참여자 정보 가공
-          const participants = challenge.participants?.map(p => {
-            return {
-              enrollment_id: p.enrollment_id,
-              user_id: p.user_id,
-              status: p.status,
-              name: p.users?.name || '알 수 없음',
-              profile_image: p.users?.profile_image || null
-            };
-          }) || [];
-          
-          return {
-            ...challenge,
-            participants,
-            participant_count: participants.length
-          };
-        });
-        console.log("가공 데이터:", processedChallenges);
-        setChallenges(processedChallenges);
-      } catch(err) {
-        console.error('챌린지 데이터 불러오기 오류:', err);
-        setError('챌린지 목록을 불러오는 중 오류가 발생했습니다.');
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchChallenges();
-  }, []);
+export default function Challenge({onSelectPage, pageName, challengeId}) {
+  const { challenges, loading, error } = useChallenges(); // useUser 훅 사용
 
   // 로그아웃 핸들
   const handleLogout = async () => {
@@ -127,6 +66,10 @@ export default function Challenge({onSelectPage, pageName}) {
     );
   }
   if (pageName === 'challengeDetail') {
+    const selectedChallenge = challenges.find(
+      challenge => challenge.challenge_id === challengeId
+    );
+    console.log(selectedChallenge);
     return (
       <>
         <AppSubHeader>
@@ -146,7 +89,9 @@ export default function Challenge({onSelectPage, pageName}) {
           </AppSubHeader.Right>
         </AppSubHeader>
         <AppContent>
-          <ChallengeDetailContent />
+          <ChallengeDetailContent 
+            challenge={selectedChallenge}
+          />
         </AppContent>
       </>
     );
