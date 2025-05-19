@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../supabase';
 import { useUser } from '../contexts/UserContext';
+import { useParticipantActivities } from '../contexts/UseParticipantActivities'; // 추가
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Navigation } from 'swiper/modules';
 import 'swiper/css';
@@ -11,6 +12,18 @@ export default function ChallengeDetailContent({ challenge }) {
   const { user, setUser } = useUser();
   const completedCount = challenge.participants.filter(p => p.status === 'completed').length;
 
+  // 1. 현재 유저의 enrollment_id 찾기
+  const currentParticipant = user && challenge.participants.find(
+    participant => participant.user_id === user.user_id
+  );
+  
+  // 2. useParticipantActivities 훅 사용 수정
+  const { activities, loading: activitiesLoading } = useParticipantActivities(
+    currentParticipant?.enrollment_id  // user_id 대신 enrollment_id 사용
+  );
+
+  console.log(activities);
+
   // 회차 날짜 계산 함수
   const calculateSequenceDates = () => {
     const dates = [];
@@ -20,16 +33,24 @@ export default function ChallengeDetailContent({ challenge }) {
       const currentDate = new Date(startDate);
       currentDate.setDate(startDate.getDate() + i);
       
-      // YY-MM-DD 형식으로 포맷팅
-      const formattedDate = `${String(currentDate.getFullYear()).slice(2)}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
+      // YYYY-MM-DD 형식으로 포맷팅 수정
+      const formattedDate = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
       dates.push(formattedDate);
     }
-    
     return dates;
+  };
+  
+
+  // 3. 각 회차별 완료 여부 확인을 위한 함수 추가
+  const isDateCompleted = (date) => {
+    return activities?.some(activity => 
+      activity.date === date && activity.completed
+    );
   };
 
   // 회차 날짜 배열
   const sequenceDates = calculateSequenceDates();
+  console.log(sequenceDates);
 
   return (
     <div className="challenge_detail">
@@ -91,15 +112,24 @@ export default function ChallengeDetailContent({ challenge }) {
                 </SwiperSlide>
                 
                 {/* 회차 슬라이드 별도로 추가 */}
-                {Array(challenge.duration_days).fill().map((_, index) => (
-                  <SwiperSlide key={`day-${index}`} className="seq_item" style={{ width: '84px' }}>
-                    <button className="btn">
-                      <b>{index + 1}</b>
-                      <i>회차</i>
-                    </button>
-                    <time>{sequenceDates[index]}</time>
-                  </SwiperSlide>
-                ))}
+                {Array(challenge.duration_days).fill().map((_, index) => {
+                  const currentDate = sequenceDates[index];
+                  const isComplete = isDateCompleted(currentDate);
+                  console.log(currentDate)
+                  return (
+                    <SwiperSlide 
+                      key={`day-${index}`} 
+                      className={`seq_item ${isComplete ? 'completed' : ''}`}
+                      style={{ width: '84px' }}
+                    >
+                      <button className="btn">
+                        <b>{index + 1}</b>
+                        <i>회차</i>
+                      </button>
+                      <time>{currentDate}</time>
+                    </SwiperSlide>
+                  );
+                })}
             </Swiper>
           </div>
         </div>

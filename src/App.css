@@ -270,6 +270,18 @@
   font-weight: 700;
   color: rgba(255, 255, 255, 0.4);
 }
+.about_challenge > .about_body .seq_item.completed::after{
+  content: url('./assets/ico_check.svg');
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  transform: translate(-50%, -50%);
+}
+.about_challenge > .about_body .seq_item.completed b, 
+.about_challenge > .about_body .seq_item.completed i,
+.about_challenge > .about_body .seq_item.completed time {
+ color: rgba(255, 255, 255, 0.4) ;
+}
 .about_challenge > .about_body .seq_item time {
   font-size: 12px;  
 }
