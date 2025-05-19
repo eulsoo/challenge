@@ -57,11 +57,7 @@ export function UserProvider({ children }) {
     
     if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
       if (session) {
-        setUser({
-          user_id: session.user.id,
-          name: 'User',
-          profile_image: null
-        });
+        setUser({user_id: session.user.id});
       } else {
         setUser(null);
       }

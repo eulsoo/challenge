@@ -22,7 +22,7 @@ export default function ChallengeListItem({challenge, onSelectPage}) {
       <div className='title'>
       <h2>{challenge.title}</h2>
       </div>
-      <div className='challengers'>
+      <div className='challenge_participants'>
         {
           challenge.participant_count ? 
             <>
@@ -63,16 +63,12 @@ export default function ChallengeListItem({challenge, onSelectPage}) {
                   className: 'btn trans small active'
                 };
                 case 'completed': return {
-                  text: '성공!',
+                  text: '완료',
                   className: 'btn trans small success'
                 };
                 case 'failed': return {
                   text: '다시시작',
                   className: 'btn trans small warning'
-                };
-                case 'padding': return {
-                  text: '시작하기',
-                  className: 'btn trans small'
                 };
                 default: return {
                   text: '시작하기',
