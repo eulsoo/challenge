@@ -22,7 +22,6 @@ function AppContent() {
   const [pageName, setPageName] = useState('login');
   const [challengeId, setChallengeId] = useState('');
   const { user, loading } = useUser();
-  console.log('현재 페이지:', pageName);
 
   // 페이지 전환 함수
   function onSelectPage(targetPage, challengeId) {

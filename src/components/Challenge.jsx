@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../supabase';
 import { useUser } from '../contexts/UserContext'; // 이미 임포트됨
+import { useParticipantActivities } from '../contexts/UseParticipantActivities';
 import AppStateDisplay from './AppStateDisplay'; 
 import AppSubHeader from './AppSubHeader';
 import AppContent from './AppContent';
@@ -10,7 +11,24 @@ import ChallengeDetailContent from './ChallengeDetailContent';
 import { useChallenges } from '../contexts/UseChallenges';
 
 export default function Challenge({onSelectPage, pageName, challengeId}) {
-  const { challenges, loading, error } = useChallenges(); // useUser 훅 사용
+  const { user, setUser } = useUser();
+  const { challenges, loading, error } = useChallenges(); 
+
+  // 0. challengeDetail 페이지일 때 사용할 challenge와 activities
+  const selectedChallenge = challengeId ? challenges.find(
+    challenge => challenge.challenge_id === challengeId
+  ) : null;
+
+  // 1. 현재 유저의 enrollment_id 찾기
+  const currentParticipant = selectedChallenge?.participants.find(
+    participant => participant.user_id === user.user_id
+  );
+  
+  // 2. useParticipantActivities 훅 사용 수정
+  const { activities, loading: activitiesLoading } = useParticipantActivities(
+    currentParticipant?.enrollment_id  
+  );
+
 
   // 로그아웃 핸들
   const handleLogout = async () => {
@@ -70,6 +88,7 @@ export default function Challenge({onSelectPage, pageName, challengeId}) {
       challenge => challenge.challenge_id === challengeId
     );
     console.log(selectedChallenge);
+    
     return (
       <>
         <AppSubHeader>
@@ -91,6 +110,8 @@ export default function Challenge({onSelectPage, pageName, challengeId}) {
         <AppContent>
           <ChallengeDetailContent 
             challenge={selectedChallenge}
+            activities={activities}
+            activitiesLoading={activitiesLoading}
           />
         </AppContent>
       </>

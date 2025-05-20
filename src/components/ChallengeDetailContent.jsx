@@ -1,28 +1,18 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../supabase';
 import { useUser } from '../contexts/UserContext';
-import { useParticipantActivities } from '../contexts/UseParticipantActivities'; // 추가
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
-export default function ChallengeDetailContent({ challenge }) {
+export default function ChallengeDetailContent({ 
+  challenge, 
+  activities, 
+  activitiesLoading 
+}) {
   const { user, setUser } = useUser();
   const completedCount = challenge.participants.filter(p => p.status === 'completed').length;
-
-  // 1. 현재 유저의 enrollment_id 찾기
-  const currentParticipant = user && challenge.participants.find(
-    participant => participant.user_id === user.user_id
-  );
-  
-  // 2. useParticipantActivities 훅 사용 수정
-  const { activities, loading: activitiesLoading } = useParticipantActivities(
-    currentParticipant?.enrollment_id  // user_id 대신 enrollment_id 사용
-  );
-
-  console.log(activities);
 
   // 회차 날짜 계산 함수
   const calculateSequenceDates = () => {
@@ -50,7 +40,7 @@ export default function ChallengeDetailContent({ challenge }) {
 
   // 회차 날짜 배열
   const sequenceDates = calculateSequenceDates();
-  console.log(sequenceDates);
+
 
   return (
     <div className="challenge_detail">
@@ -115,7 +105,7 @@ export default function ChallengeDetailContent({ challenge }) {
                 {Array(challenge.duration_days).fill().map((_, index) => {
                   const currentDate = sequenceDates[index];
                   const isComplete = isDateCompleted(currentDate);
-                  console.log(currentDate)
+                  
                   return (
                     <SwiperSlide 
                       key={`day-${index}`} 

@@ -44,6 +44,7 @@ export function useChallenges() {
           console.log("원본 데이터:", challengesData);
         if (challengesError) throw challengesError;
 
+      
         // 3. 챌린지별 참여자 수 계산하여 데이터 가공
         const processedChallenges = challengesData.map(challenge => {
           // 참여자 정보 가공
