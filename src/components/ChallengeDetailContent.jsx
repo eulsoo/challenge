@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useUser } from '../contexts/UserContext';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Navigation } from 'swiper/modules';
@@ -6,16 +6,23 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
-export default function ChallengeDetailContent({ 
-  challenge, 
-  activities, 
-  activitiesLoading 
-}) {
+export default function ChallengeDetailContent({ challenge }) {
+  console.log(challenge);
+  const swiperRef = useRef(null);
   const { user, setUser } = useUser();
   const completedCount = challenge.participants.filter(p => p.status === 'completed').length;
+  
+  useEffect(() => { // activities가 변경될 때마다 Swiper 리프레시
+    if (swiperRef.current?.swiper) {
+      swiperRef.current.swiper.update();
+      // 특정 슬라이드로 이동
+      swiperRef.current.swiper.slideTo(challenge.participantActivities.length);
+    }
+  }, [challenge.participantActivities]);
 
+  
   // 회차 날짜 계산 함수
-  const calculateSequenceDates = () => {
+  function calculateSequenceDates() {
     const dates = [];
     const startDate = new Date(challenge.start_date);
     
@@ -30,17 +37,12 @@ export default function ChallengeDetailContent({
     return dates;
   };
   
-
   // 3. 각 회차별 완료 여부 확인을 위한 함수 추가
-  const isDateCompleted = (date) => {
-    return activities?.some(activity => 
+  const isDateCompleted = function isDateCompleted(date){
+    return challenge.participantActivities?.some(activity => 
       activity.date === date && activity.completed
     );
   };
-
-  // 회차 날짜 배열
-  const sequenceDates = calculateSequenceDates();
-
 
   return (
     <div className="challenge_detail">
@@ -89,10 +91,9 @@ export default function ChallengeDetailContent({
               modules={[Pagination, Navigation]}
               spaceBetween={10}
               slidesPerView="auto"
-              // centeredSlides={true}
-              // pagination={{ clickable: true }}
-              // navigation={true}
+              initialSlide={challenge.participantActivities.length}
               className="sequence_indicator"
+              ref={swiperRef}
             >
               {/* 배지 슬라이드를 먼저 추가 */}
                 <SwiperSlide key="badge" className="badge-slide seq_item" style={{ width: '84px' }}>
@@ -103,9 +104,9 @@ export default function ChallengeDetailContent({
                 
                 {/* 회차 슬라이드 별도로 추가 */}
                 {Array(challenge.duration_days).fill().map((_, index) => {
-                  const currentDate = sequenceDates[index];
+                  const currentDate = calculateSequenceDates()[index];
                   const isComplete = isDateCompleted(currentDate);
-                  
+                  console.log(isComplete);
                   return (
                     <SwiperSlide 
                       key={`day-${index}`} 
@@ -123,7 +124,6 @@ export default function ChallengeDetailContent({
             </Swiper>
           </div>
         </div>
-
       </div>
       <div className="challenge_participants">
         {
@@ -158,11 +158,30 @@ export default function ChallengeDetailContent({
           <i>{completedCount ? completedCount + '명 성공 /' : ''} {challenge.participant_count ? challenge.participant_count + '명' : '없음'}</i>
         </strong>
       </div>
-      <button
-        className='btn big round' 
-        style={{backgroundColor: `${challenge.color}`}}
-      >시작하기</button>
-
+      
+      {
+        (() => {
+          const participant = user && challenge.participants.find(
+            participant => participant.user_id === user.user_id
+          );
+          
+          const getStartButtonText = () => {
+            if (!participant) return '시작하기';
+            switch (participant.status) {
+              case 'in_progress' : return `${challenge.participantActivities.length + 1}회차 일기 쓰기`;
+              case 'completed' : return '확인';
+              case 'failed' : return '다시 도전 하기';
+              default : return '시작하기';
+            }
+          };
+          return (
+            <button
+              className='btn big round' 
+              style={{backgroundColor: `${challenge.color}`}}
+            >{getStartButtonText()}</button>
+          );
+        })()
+      }
     </div>
   );
 }

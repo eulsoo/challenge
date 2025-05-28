@@ -1,36 +1,19 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../supabase';
-import { useUser } from '../contexts/UserContext'; // 이미 임포트됨
-import { useParticipantActivities } from '../contexts/UseParticipantActivities';
+import { useUser } from '../contexts/UserContext';
+import { useChallenges } from '../contexts/UseChallenges';
 import AppStateDisplay from './AppStateDisplay'; 
 import AppSubHeader from './AppSubHeader';
 import AppContent from './AppContent';
 import AppIcon from './AppIcon';
 import ChallengeListItem from './ChallengeListItem';
 import ChallengeDetailContent from './ChallengeDetailContent';
-import { useChallenges } from '../contexts/UseChallenges';
 
 export default function Challenge({onSelectPage, pageName, challengeId}) {
   const { user, setUser } = useUser();
-  const { challenges, loading, error } = useChallenges(); 
+  const { challenges, loading, error, enhanceChallengesWithActivities } = useChallenges(); 
+  const [enhancedChallenges, setEnhancedChallenges] = useState([]);
 
-  // 0. challengeDetail 페이지일 때 사용할 challenge와 activities
-  const selectedChallenge = challengeId ? challenges.find(
-    challenge => challenge.challenge_id === challengeId
-  ) : null;
-
-  // 1. 현재 유저의 enrollment_id 찾기
-  const currentParticipant = selectedChallenge?.participants.find(
-    participant => participant.user_id === user.user_id
-  );
-  
-  // 2. useParticipantActivities 훅 사용 수정
-  const { activities, loading: activitiesLoading } = useParticipantActivities(
-    currentParticipant?.enrollment_id  
-  );
-
-
-  // 로그아웃 핸들
   const handleLogout = async () => {
     try {
       console.log('로그아웃 시도');
@@ -43,12 +26,23 @@ export default function Challenge({onSelectPage, pageName, challengeId}) {
     }
   };
 
+  useEffect(() => {
+    if (pageName === 'challengeList' && challenges.length > 0 && user) {
+      enhanceChallengesWithActivities(challenges, user.user_id)
+        .then(enhanced => {
+          setEnhancedChallenges(enhanced);
+          console.log('Enhanced challenges:', enhanced);
+        });
+    }
+  }, [pageName, challenges, user]);
+  
   if (loading || error) {
     return (
       <AppStateDisplay loading={loading} error={error}/>
     );
   }
   if (pageName === 'challengeList') {
+
     return (
       <>
         <AppSubHeader>
@@ -70,7 +64,7 @@ export default function Challenge({onSelectPage, pageName, challengeId}) {
         <AppContent>
           <ul className='challenges'>
             {
-              challenges.map(challenge => (
+              enhancedChallenges.map(challenge => (
                 <ChallengeListItem 
                   key={challenge.challenge_id}
                   challenge={challenge}
@@ -84,10 +78,9 @@ export default function Challenge({onSelectPage, pageName, challengeId}) {
     );
   }
   if (pageName === 'challengeDetail') {
-    const selectedChallenge = challenges.find(
+    const selectedChallenge = enhancedChallenges.find(
       challenge => challenge.challenge_id === challengeId
     );
-    console.log(selectedChallenge);
     
     return (
       <>
@@ -110,8 +103,6 @@ export default function Challenge({onSelectPage, pageName, challengeId}) {
         <AppContent>
           <ChallengeDetailContent 
             challenge={selectedChallenge}
-            activities={activities}
-            activitiesLoading={activitiesLoading}
           />
         </AppContent>
       </>

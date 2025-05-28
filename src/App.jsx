@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { UserProvider, useUser } from './contexts/UserContext';
+import { ChallengesProvider } from './contexts/UseChallenges';
 import Challenge from './components/Challenge';
 import Login from './components/Login';
 import AppStateDisplay from './components/AppStateDisplay';
@@ -118,11 +119,13 @@ function App() {
 
   return (
     <>
+    <ChallengesProvider>
       <UserProvider>
         <div className='wrap'>
           <AppContent />
         </div>
       </UserProvider>
+    </ChallengesProvider>
     </>
   )
 }

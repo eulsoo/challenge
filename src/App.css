@@ -126,7 +126,7 @@
   flex-direction: column;
   gap: 15px;
   color: var(--wgm_white);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.2);
   box-sizing: border-box;
 }
 .challenge_item > .title {
@@ -240,6 +240,7 @@
 .about_challenge .sequence_indicator {
   display: flex;
   padding-left: 16px;
+  padding-right: 16px;
 }
 .about_challenge .sequence_indicator > div {
   width: 84px !important;

@@ -1,5 +1,3 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '../supabase';
 import { useUser } from '../contexts/UserContext';
 
 export default function ChallengeListItem({challenge, onSelectPage}) {

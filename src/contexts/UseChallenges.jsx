@@ -1,10 +1,52 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
 import { supabase } from '../supabase';
 
-export function useChallenges() {
+const ChallengesContext = createContext();
+
+export function ChallengesProvider({ children }) {
   const [challenges, setChallenges] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // 4. enhanceChallengesWithActivities 함수 추가
+  const enhanceChallengesWithActivities = async (challengesData, userId) => {
+    try {
+      const enrollmentIds = challengesData
+        .flatMap(challenge => challenge.participants)
+        .filter(participant => participant.user_id === userId)
+        .map(participant => participant.enrollment_id)
+        .filter(Boolean);
+
+      if (enrollmentIds.length === 0) return challengesData;
+
+      const { data: activitiesData, error } = await supabase
+        .from('participant_activities')
+        .select('*')
+        .in('enrollment_id', enrollmentIds)
+        .order('date', { ascending: false });
+
+      if (error) throw error;
+
+      return challengesData.map(challenge => {
+        const challengeActivities = activitiesData.filter(activity => 
+          challenge.participants.some(p => 
+            p.enrollment_id === activity.enrollment_id && 
+            p.user_id === userId
+          )
+        );
+
+        return {
+          ...challenge,
+          participantActivities: challengeActivities,
+          completedActivitiesCount: challengeActivities.filter(a => a.completed).length,
+          lastActivity: challengeActivities[0] || null
+        };
+      });
+    } catch (err) {
+      console.error('Activities 데이터 로딩 오류:', err);
+      return challengesData;
+    }
+  };
 
   // 챌린지 데이터 작업
   useEffect(() => {
@@ -78,5 +120,17 @@ export function useChallenges() {
     }
     fetchChallenges();
   }, []);
-  return { challenges, loading, error }
+  // 6. Provider 반환 추가
+  return (
+    <ChallengesContext.Provider value={{ 
+      challenges, 
+      loading, 
+      error,
+      enhanceChallengesWithActivities 
+    }}>
+      {children}
+    </ChallengesContext.Provider>
+  );
 }
+
+export const useChallenges = () => useContext(ChallengesContext);
